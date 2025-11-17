@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KVNG HORLA SCOPE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="title">KVNG HORLA SCOPE</h1>
+    </header>
+
+    <!-- Date Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-item">
+            <label for="todayDate">Today's Date:</label>
+            <span id="todayDate" class="today-display"></span>
+        </div>
+        <div class="filter-item">
+            <label for="dateFilter">Filter by Date:</label>
+            <input type="date" id="dateFilter" class="date-input">
+        </div>
+        <div class="filter-item">
+            <label for="monthFilter">Monthly Summary:</label>
+            <input type="month" id="monthFilter" class="month-input">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Daily Summary Cards -->
+        <section class="summary-section">
+            <h2 class="section-title">Daily Summary</h2>
+            <div class="summary-cards">
+                <div class="summary-card sales-card">
+                    <div class="card-label">Total Sales (Today)</div>
+                    <div class="card-value" id="dailySales">₦0.00</div>
+                </div>
+                <div class="summary-card profit-card">
+                    <div class="card-label">Total 13% Profit (Today)</div>
+                    <div class="card-value" id="dailyProfit">₦0.00</div>
+                </div>
+                <div class="summary-card expense-card">
+                    <div class="card-label">Total Expenses (Today)</div>
+                    <div class="card-value" id="dailyExpense">₦0.00</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monthly Summary Cards -->
+        <section class="summary-section">
+            <h2 class="section-title">Monthly Summary</h2>
+            <div class="summary-cards">
+                <div class="summary-card sales-card">
+                    <div class="card-label">Total Monthly Sales</div>
+                    <div class="card-value" id="monthlySales">₦0.00</div>
+                </div>
+                <div class="summary-card profit-card">
+                    <div class="card-label">Total Monthly Profit</div>
+                    <div class="card-value" id="monthlyProfit">₦0.00</div>
+                </div>
+                <div class="summary-card expense-card">
+                    <div class="card-label">Total Monthly Expenses</div>
+                    <div class="card-value" id="monthlyExpense">₦0.00</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transaction Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2 class="section-title">Transactions</h2>
+                <button id="addTransactionBtn" class="add-btn">+ Add New Transaction</button>
+            </div>
+            <div class="table-container">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Game Name</th>
+                            <th>Game Time</th>
+                            <th>Sales (₦)</th>
+                            <th>13% Profit (₦)</th>
+                            <th>Expense / Payout (₦)</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <!-- Rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
