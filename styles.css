@@ -153,7 +153,7 @@ body {
 }
 
 .card-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -177,9 +177,13 @@ body {
     gap: 1rem;
 }
 
-.add-btn {
-    background: linear-gradient(135deg, var(--navy-blue) 0%, #2c3e50 100%);
-    color: var(--white);
+.button-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.add-btn, .save-btn {
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
@@ -188,6 +192,11 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--white);
+}
+
+.add-btn {
+    background: linear-gradient(135deg, var(--navy-blue) 0%, #2c3e50 100%);
 }
 
 .add-btn:hover {
@@ -198,6 +207,26 @@ body {
 
 .add-btn:active {
     transform: translateY(0);
+}
+
+.save-btn {
+    background: linear-gradient(135deg, var(--success-green) 0%, #229954 100%);
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #229954 0%, var(--success-green) 100%);
+}
+
+.save-btn:active {
+    transform: translateY(0);
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* Table Container */
@@ -361,7 +390,7 @@ body {
     }
 
     .card-value {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
 
     .table-header {
@@ -369,7 +398,12 @@ body {
         align-items: flex-start;
     }
 
-    .add-btn {
+    .button-group {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .add-btn, .save-btn {
         width: 100%;
     }
 

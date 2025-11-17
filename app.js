@@ -1,4 +1,34 @@
 // ========================================
+// FIREBASE CONFIGURATION
+// ========================================
+
+// Firebase configuration - Users should replace these with their own Firebase project credentials
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+let db = null;
+let firebaseInitialized = false;
+
+try {
+    if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseInitialized = true;
+        console.log('Firebase initialized successfully');
+    }
+} catch (error) {
+    console.warn('Firebase initialization failed:', error.message);
+    console.warn('Falling back to localStorage only. Update firebaseConfig in app.js to enable cloud sync.');
+}
+
+// ========================================
 // DATA MODELS & STORAGE
 // ========================================
 
@@ -144,6 +174,75 @@ function saveTransactions() {
         localStorage.setItem('kvngHorlaTransactions', JSON.stringify(transactions));
     } catch (e) {
         console.error('Error saving transactions:', e);
+    }
+}
+
+// ========================================
+// FIREBASE OPERATIONS
+// ========================================
+
+// Save all transactions to Firebase Firestore
+async function saveToFirebase() {
+    if (!firebaseInitialized || !db) {
+        alert('Firebase is not configured. Please update the Firebase configuration in app.js to enable cloud sync.\n\nYour data is still saved locally in your browser.');
+        return false;
+    }
+
+    const saveBtn = document.getElementById('saveToFirebaseBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = '💾 Saving...';
+
+    try {
+        // Save each transaction to Firestore
+        const batch = db.batch();
+        
+        transactions.forEach(transaction => {
+            const docRef = db.collection('transactions').doc(transaction.id);
+            batch.set(docRef, transaction);
+        });
+
+        await batch.commit();
+        
+        saveBtn.textContent = '✅ Saved!';
+        setTimeout(() => {
+            saveBtn.textContent = '💾 Save to Cloud';
+            saveBtn.disabled = false;
+        }, 2000);
+        
+        alert('Transactions saved to cloud successfully!');
+        return true;
+    } catch (error) {
+        console.error('Error saving to Firebase:', error);
+        alert('Failed to save to cloud: ' + error.message + '\n\nYour data is still saved locally in your browser.');
+        saveBtn.textContent = '💾 Save to Cloud';
+        saveBtn.disabled = false;
+        return false;
+    }
+}
+
+// Load transactions from Firebase Firestore
+async function loadFromFirebase() {
+    if (!firebaseInitialized || !db) {
+        console.log('Firebase not configured, using localStorage only');
+        return;
+    }
+
+    try {
+        const snapshot = await db.collection('transactions').get();
+        const firebaseTransactions = [];
+        
+        snapshot.forEach(doc => {
+            firebaseTransactions.push(doc.data());
+        });
+
+        if (firebaseTransactions.length > 0) {
+            transactions = firebaseTransactions;
+            saveTransactions(); // Also save to localStorage
+            console.log('Loaded transactions from Firebase');
+        }
+    } catch (error) {
+        console.warn('Error loading from Firebase:', error.message);
+        console.log('Using localStorage data instead');
     }
 }
 
@@ -305,18 +404,7 @@ function createTransactionRow(transaction) {
     salesInput.step = '0.01';
     salesInput.value = transaction.sales || '';
     salesInput.placeholder = '0.00';
-    salesInput.addEventListener('input', (e) => {
-        const salesValue = parseFloat(e.target.value) || 0;
-        const { profit13, expense } = calculateProfitAndExpense(salesValue);
-        updateTransaction(transaction.id, 'sales', salesValue);
-        updateTransaction(transaction.id, 'profit13', profit13);
-        updateTransaction(transaction.id, 'expense', expense);
-        renderTransactionTable();
-        updateDailySummary();
-        updateMonthlySummary();
-    });
-    salesCell.appendChild(salesInput);
-
+    
     // 13% Profit cell (auto-calculated, read-only display)
     const profitCell = document.createElement('td');
     profitCell.textContent = formatCurrency(transaction.profit13);
@@ -328,6 +416,21 @@ function createTransactionRow(transaction) {
     expenseCell.textContent = formatCurrency(transaction.expense);
     expenseCell.style.fontWeight = '600';
     expenseCell.style.color = '#e74c3c';
+    
+    // Update profit and expense cells on input without re-rendering entire table
+    salesInput.addEventListener('input', (e) => {
+        const salesValue = parseFloat(e.target.value) || 0;
+        const { profit13, expense } = calculateProfitAndExpense(salesValue);
+        updateTransaction(transaction.id, 'sales', salesValue);
+        updateTransaction(transaction.id, 'profit13', profit13);
+        updateTransaction(transaction.id, 'expense', expense);
+        // Update only the specific cells instead of re-rendering entire table
+        profitCell.textContent = formatCurrency(profit13);
+        expenseCell.textContent = formatCurrency(expense);
+        updateDailySummary();
+        updateMonthlySummary();
+    });
+    salesCell.appendChild(salesInput);
 
     // Notes cell
     const notesCell = document.createElement('td');
@@ -413,7 +516,7 @@ function deleteTransaction(transactionId) {
 // ========================================
 
 // Initialize the application
-function init() {
+async function init() {
     // Display today's date
     const todayElement = document.getElementById('todayDate');
     const today = new Date();
@@ -428,8 +531,11 @@ function init() {
     document.getElementById('dateFilter').value = getTodayDate();
     document.getElementById('monthFilter').value = getCurrentMonth();
 
-    // Load transactions from localStorage
+    // Load transactions from localStorage first
     loadTransactions();
+    
+    // Try to load from Firebase if configured
+    await loadFromFirebase();
 
     // Render initial state
     renderTransactionTable();
@@ -438,6 +544,8 @@ function init() {
 
     // Event listeners
     document.getElementById('addTransactionBtn').addEventListener('click', addTransaction);
+    
+    document.getElementById('saveToFirebaseBtn').addEventListener('click', saveToFirebase);
     
     document.getElementById('dateFilter').addEventListener('change', () => {
         updateDailySummary();

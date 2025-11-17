@@ -75,7 +75,10 @@
         <section class="table-section">
             <div class="table-header">
                 <h2 class="section-title">Transactions</h2>
-                <button id="addTransactionBtn" class="add-btn">+ Add New Transaction</button>
+                <div class="button-group">
+                    <button id="saveToFirebaseBtn" class="save-btn">💾 Save to Cloud</button>
+                    <button id="addTransactionBtn" class="add-btn">+ Add New Transaction</button>
+                </div>
             </div>
             <div class="table-container">
                 <table class="transaction-table">
@@ -99,6 +102,9 @@
         </section>
     </main>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
