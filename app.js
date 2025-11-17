@@ -2,21 +2,87 @@
 // DATA MODELS & STORAGE
 // ========================================
 
-// 12 Baba Ijebu games with unique times between 8:00 AM and 11:00 PM
-const games = [
-    { id: 1, name: 'Golden Chance', time: '08:00' },
-    { id: 2, name: 'Mega Draw', time: '09:30' },
-    { id: 3, name: 'Night Star', time: '11:00' },
-    { id: 4, name: 'Lucky Fortune', time: '12:30' },
-    { id: 5, name: 'Diamond Plus', time: '14:00' },
-    { id: 6, name: 'Super Jackpot', time: '15:30' },
-    { id: 7, name: 'Royal King', time: '17:00' },
-    { id: 8, name: 'Premier Lotto', time: '18:30' },
-    { id: 9, name: 'Midnight Special', time: '19:30' },
-    { id: 10, name: 'Evening Thunder', time: '20:30' },
-    { id: 11, name: 'Late Night Winner', time: '21:30' },
-    { id: 12, name: 'Final Draw', time: '23:00' }
-];
+// Games organized by day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+// Each day has different Baba Ijebu games with unique times
+const gamesByDay = {
+    0: [ // Sunday
+        { id: 101, name: 'Sunday Special', time: '08:00' },
+        { id: 102, name: 'Holy Draw', time: '10:00' },
+        { id: 103, name: 'Weekend Winner', time: '12:00' },
+        { id: 104, name: 'Sunday Fortune', time: '14:00' },
+        { id: 105, name: 'Blessed Lotto', time: '16:00' },
+        { id: 106, name: 'Evening Glory', time: '18:00' },
+        { id: 107, name: 'Sunday Sunset', time: '20:00' },
+        { id: 108, name: 'Night Blessing', time: '22:00' }
+    ],
+    1: [ // Monday
+        { id: 201, name: 'Monday Starter', time: '08:00' },
+        { id: 202, name: 'Morning Rush', time: '10:00' },
+        { id: 203, name: 'Midday Magic', time: '12:00' },
+        { id: 204, name: 'Afternoon Luck', time: '14:00' },
+        { id: 205, name: 'Evening Power', time: '16:00' },
+        { id: 206, name: 'Night Champion', time: '18:00' },
+        { id: 207, name: 'Monday Close', time: '20:00' },
+        { id: 208, name: 'Late Winner', time: '22:00' }
+    ],
+    2: [ // Tuesday
+        { id: 301, name: 'Tuesday Dawn', time: '08:00' },
+        { id: 302, name: 'Golden Tuesday', time: '10:00' },
+        { id: 303, name: 'Mid-Week Start', time: '12:00' },
+        { id: 304, name: 'Lucky Tuesday', time: '14:00' },
+        { id: 305, name: 'Tuesday Thunder', time: '16:00' },
+        { id: 306, name: 'Evening Star', time: '18:00' },
+        { id: 307, name: 'Night Fortune', time: '20:00' },
+        { id: 308, name: 'Final Tuesday', time: '22:00' }
+    ],
+    3: [ // Wednesday
+        { id: 401, name: 'Wednesday Wonder', time: '08:00' },
+        { id: 402, name: 'Mid-Week Special', time: '10:00' },
+        { id: 403, name: 'Hump Day Draw', time: '12:00' },
+        { id: 404, name: 'Wednesday Wealth', time: '14:00' },
+        { id: 405, name: 'Midweek Master', time: '16:00' },
+        { id: 406, name: 'Evening Jackpot', time: '18:00' },
+        { id: 407, name: 'Wednesday Night', time: '20:00' },
+        { id: 408, name: 'Late Midweek', time: '22:00' }
+    ],
+    4: [ // Thursday
+        { id: 501, name: 'Thursday Thrill', time: '08:00' },
+        { id: 502, name: 'Morning Jackpot', time: '10:00' },
+        { id: 503, name: 'Thursday Peak', time: '12:00' },
+        { id: 504, name: 'Lucky Thursday', time: '14:00' },
+        { id: 505, name: 'Thursday Gold', time: '16:00' },
+        { id: 506, name: 'Evening Thunder', time: '18:00' },
+        { id: 507, name: 'Thursday Night', time: '20:00' },
+        { id: 508, name: 'Late Thunder', time: '22:00' }
+    ],
+    5: [ // Friday
+        { id: 601, name: 'Friday Freedom', time: '08:00' },
+        { id: 602, name: 'TGIF Special', time: '10:00' },
+        { id: 603, name: 'Friday Fortune', time: '12:00' },
+        { id: 604, name: 'Weekend Preview', time: '14:00' },
+        { id: 605, name: 'Friday Flash', time: '16:00' },
+        { id: 606, name: 'Friday Night Lights', time: '18:00' },
+        { id: 607, name: 'Party Draw', time: '20:00' },
+        { id: 608, name: 'Friday Finale', time: '22:00' }
+    ],
+    6: [ // Saturday
+        { id: 701, name: 'Saturday Sunrise', time: '08:00' },
+        { id: 702, name: 'Weekend Bonanza', time: '10:00' },
+        { id: 703, name: 'Saturday Special', time: '12:00' },
+        { id: 704, name: 'Jackpot Saturday', time: '14:00' },
+        { id: 705, name: 'Saturday Gold', time: '16:00' },
+        { id: 706, name: 'Prime Saturday', time: '18:00' },
+        { id: 707, name: 'Saturday Night Fever', time: '20:00' },
+        { id: 708, name: 'Weekend Closer', time: '22:00' }
+    ]
+};
+
+// Get games for a specific date
+function getGamesForDate(dateString) {
+    const date = new Date(dateString + 'T00:00:00'); // Ensure proper parsing
+    const dayOfWeek = date.getDay();
+    return gamesByDay[dayOfWeek] || [];
+}
 
 // Transaction array stored in memory and localStorage
 let transactions = [];
@@ -180,6 +246,9 @@ function createTransactionRow(transaction) {
     const row = document.createElement('tr');
     row.dataset.transactionId = transaction.id;
 
+    // Get games for the transaction date
+    const availableGames = getGamesForDate(transaction.date);
+
     // Date cell
     const dateCell = document.createElement('td');
     const dateInput = document.createElement('input');
@@ -187,6 +256,11 @@ function createTransactionRow(transaction) {
     dateInput.value = transaction.date;
     dateInput.addEventListener('change', (e) => {
         updateTransaction(transaction.id, 'date', e.target.value);
+        // Reset game selection when date changes since games are day-specific
+        updateTransaction(transaction.id, 'gameId', null);
+        updateTransaction(transaction.id, 'gameName', '');
+        updateTransaction(transaction.id, 'gameTime', '');
+        renderTransactionTable();
     });
     dateCell.appendChild(dateInput);
 
@@ -194,7 +268,7 @@ function createTransactionRow(transaction) {
     const gameNameCell = document.createElement('td');
     const gameSelect = document.createElement('select');
     gameSelect.innerHTML = '<option value="">Select Game</option>';
-    games.forEach(game => {
+    availableGames.forEach(game => {
         const option = document.createElement('option');
         option.value = game.id;
         option.textContent = game.name;
@@ -205,7 +279,7 @@ function createTransactionRow(transaction) {
     });
     gameSelect.addEventListener('change', (e) => {
         const selectedGameId = parseInt(e.target.value);
-        const selectedGame = games.find(g => g.id === selectedGameId);
+        const selectedGame = availableGames.find(g => g.id === selectedGameId);
         if (selectedGame) {
             updateTransaction(transaction.id, 'gameId', selectedGame.id);
             updateTransaction(transaction.id, 'gameName', selectedGame.name);
